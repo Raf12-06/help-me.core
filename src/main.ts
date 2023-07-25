@@ -6,10 +6,10 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { join } from 'path';
 import { readdirSync } from 'fs';
+import * as Handlebars from 'handlebars';
 
 async function bootstrap() {
-
-  const PORT = process.env.PORT ?? 8000;
+  const PORT = process.env.PORT;
 
   const fastifyAdapter = new FastifyAdapter();
   const app = await NestFactory.create<NestFastifyApplication>(
@@ -35,6 +35,10 @@ async function bootstrap() {
         ]),
       ),
     },
+  });
+
+  Handlebars.registerHelper('toJson', (content) => {
+    return JSON.stringify(content);
   });
 
   await app.listen(PORT, () => {

@@ -6,10 +6,19 @@
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <script src="https://api-maps.yandex.ru/v3/?apikey=9bfd234f-56de-4b04-8d59-5e5d3a5b9c87&lang=ru_RU" type="text/javascript"></script>
-    <title>Document</title>
+    <title>Help me map</title>
 </head>
 <body>
     <div id="app"></div>
+    <a href="/add">
+        <svg width="50px" height="50px" viewBox="0 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns">
+            <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" sketch:type="MSPage">
+                <g id="Icon-Set-Filled" sketch:type="MSLayerGroup" transform="translate(-102.000000, -1037.000000)" fill="#000000">
+                    <path d="M124,1054 L119,1054 L119,1059 C119,1059.55 118.552,1060 118,1060 C117.448,1060 117,1059.55 117,1059 L117,1054 L112,1054 C111.448,1054 111,1053.55 111,1053 C111,1052.45 111.448,1052 112,1052 L117,1052 L117,1047 C117,1046.45 117.448,1046 118,1046 C118.552,1046 119,1046.45 119,1047 L119,1052 L124,1052 C124.552,1052 125,1052.45 125,1053 C125,1053.55 124.552,1054 124,1054 L124,1054 Z M130,1037 L106,1037 C103.791,1037 102,1038.79 102,1041 L102,1065 C102,1067.21 103.791,1069 106,1069 L130,1069 C132.209,1069 134,1067.21 134,1065 L134,1041 C134,1038.79 132.209,1037 130,1037 L130,1037 Z" id="plus-square" sketch:type="MSShapeGroup"></path>
+                </g>
+            </g>
+        </svg>
+    </a>
 </body>
 <script>
     window.map = null;
@@ -20,22 +29,27 @@
         await ymaps3.ready;
         const {
             YMap,
+            YMapMarker,
             YMapDefaultSchemeLayer,
-            YMapDefaultFeaturesLayer
+            YMapDefaultFeaturesLayer,
         } = ymaps3;
 
-        const {YMapDefaultMarker} = await ymaps3.import('@yandex/ymaps3-markers@0.0.1');
-
         map = new YMap(document.getElementById('app'), {
-            location: {center: [54.609428, 53.704385], zoom: 15.05},
-            mode: 'vector'
+            location: {center: [54.609428, 53.704385], zoom: 15.05}
         });
 
         map.addChild(new YMapDefaultSchemeLayer());
-        map.addChild(new YMapDefaultFeaturesLayer({id: 'features'}));
+        map.addChild(new YMapDefaultFeaturesLayer());
 
-        const marker = new YMapDefaultMarker({ coordinates: [54.609428, 53.704385] });
-        map.addChild(marker);
+        const listRequest = JSON.parse('{{{toJson list_request}}}');
+
+        for (let request of listRequest) {
+            const el = document.createElement('img');
+            el.className = 'request-marker';
+            el.src = `/public/${request.request_type}.svg`;
+            el.onclick = () => map.update({location: { center: request.point.coordinates, zoom: 15, duration: 400}});
+            map.addChild(new YMapMarker({coordinates: request.point.coordinates}, el));
+        }
     }
 </script>
 <style>
@@ -46,8 +60,28 @@
         height: 100%;
         margin: 0;
         padding: 0;
-
         font-family: 'Yandex Sans Text', Arial, Helvetica, sans-serif;
+    }
+
+    a {
+        position: absolute;
+        left: 50%;
+        bottom: 5%;
+
+        display:block;
+        height: 50px;
+        width: 50px;
+        background-color: transparent;
+        border: none;
+        cursor: pointer;
+        transform: translate(-50%, -50%);
+    }
+
+    .request-marker {
+        position: relative;
+        box-sizing: border-box;
+        transform: translate(-50%,calc(-50% - 24px));
+        cursor: pointer;
     }
 </style>
 </html>

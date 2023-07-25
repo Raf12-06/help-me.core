@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="https://api-maps.yandex.ru/v3/?apikey=9bfd234f-56de-4b04-8d59-5e5d3a5b9c87&lang=ru_RU" type="text/javascript"></script>
+    <title>Document</title>
+</head>
+<body>
+    <p>
+        <label>
+            Тип:
+            <select id="type-select">
+                <option value="repair">Починить</option>
+                <option value="deliver">Доставить</option>
+                <option value="help">Помощь</option>
+            </select>
+        </label>
+    </p>
+    <p>
+        <label>
+            Описание:
+            <input type="text">
+        </label>
+    </p>
+    <div id="app"></div>
+</body>
+<script>
+    window.map = null;
+
+    main();
+
+    async function main() {
+        await ymaps3.ready;
+        const {YMap, YMapDefaultSchemeLayer} = ymaps3;
+
+        map = new YMap(document.getElementById('app'), {
+            location: {center: [54.609428, 53.704385], zoom: 15.05}
+        });
+
+        map.addChild((new YMapDefaultSchemeLayer()));
+    }
+</script>
+<style>
+    #app {
+        width: 320px;
+        height: 240px;
+        font-family: 'Yandex Sans Text', Arial, Helvetica, sans-serif;
+    }
+</style>
+</html>
