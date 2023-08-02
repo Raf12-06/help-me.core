@@ -25,6 +25,12 @@
             <input type="text">
         </label>
     </p>
+    <p>
+        <label>
+            Адрес:
+            <input type="text" id="input-address">
+        </label>
+    </p>
     <div id="app"></div>
 </body>
 <script>
@@ -34,20 +40,43 @@
 
     async function main() {
         await ymaps3.ready;
-        const {YMap, YMapDefaultSchemeLayer} = ymaps3;
+
+        const { YMap, YMapDefaultSchemeLayer, YMapDefaultFeaturesLayer } = ymaps3;
 
         map = new YMap(document.getElementById('app'), {
-            location: {center: [54.609428, 53.704385], zoom: 15.05}
+            location: { center: [54.609428, 53.704385], zoom: 15.05 }
         });
-
-        map.addChild((new YMapDefaultSchemeLayer()));
+        map.addChild(new YMapDefaultSchemeLayer());
+        map.addChild(new YMapDefaultFeaturesLayer());
     }
+
+    const inputAddress = document.getElementById('input-address');
+    inputAddress.onkeydown = (async ev => {
+        if (ev.code === "Enter" && inputAddress.value) {
+            const result = await ymaps3.search({ text: inputAddress.value, limit: 1 });
+            const coordinates = result[0]?.geometry?.coordinates;
+            map.update({ location: { center: coordinates, zoom: 15, duration: 400 }});
+
+            const el = document.createElement('img');
+            el.className = 'request-marker';
+            el.src = '/public/help.svg';
+            console.log(el)
+            map.addChild(new ymaps3.YMapMarker({ coordinates, draggable: true }), el);
+        }
+    });
 </script>
 <style>
     #app {
         width: 320px;
         height: 240px;
         font-family: 'Yandex Sans Text', Arial, Helvetica, sans-serif;
+    }
+
+    .request-marker {
+        position: relative;
+        box-sizing: border-box;
+        transform: translate(-50%,calc(-50% - 24px));
+        cursor: pointer;
     }
 </style>
 </html>
