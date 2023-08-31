@@ -22,7 +22,7 @@
     <p>
         <label>
             Описание:
-            <input type="text">
+            <input type="text" id="description">
         </label>
     </p>
     <p>
@@ -32,22 +32,53 @@
         </label>
     </p>
     <div id="app"></div>
+    <p>
+        <button type="submit" id="setButton">Установить</button>
+    </p>
 </body>
 <script>
     window.map = null;
 
-    main();
-
+    let mainCoordinates = [53.694955, 54.600708];
+    let mainPlaceMark = null;
     async function main() {
         await ymaps3.ready;
 
-        const { YMap, YMapDefaultSchemeLayer, YMapDefaultFeaturesLayer } = ymaps3;
+        const { YMap, YMapDefaultSchemeLayer, YMapDefaultFeaturesLayer, YMapListener } = ymaps3;
 
         map = new YMap(document.getElementById('app'), {
-            location: { center: [54.609428, 53.704385], zoom: 15.05 }
+            location: { center: mainCoordinates, zoom: 15.05 },
         });
+
         map.addChild(new YMapDefaultSchemeLayer());
         map.addChild(new YMapDefaultFeaturesLayer());
+
+        const el = document.createElement('img');
+        el.className = 'request-marker';
+        el.src = `/public/help.svg`;
+        mainPlaceMark = new ymaps3.YMapMarker({ coordinates: mainCoordinates, draggable: true }, el);
+        map.addChild(mainPlaceMark);
+
+        const mapListener = new YMapListener({
+            layer: 'any',
+            onActionStart: ({type}) => {
+                if (type === 'drag') {
+                    mainPlaceMark.update({ coordinates: map })
+                }
+            },
+            onActionEnd: ({type}) => {
+                if (type === 'drag') {
+                    mainPlaceMark.update({ coordinates: map })
+                }
+            }
+        });
+        map.addChild(mapListener);
+    }
+
+    main();
+
+    document.getElementById('type-select').onclick = () => {
+        mainPlaceMark.update();
     }
 
     const inputAddress = document.getElementById('input-address');
@@ -55,15 +86,33 @@
         if (ev.code === "Enter" && inputAddress.value) {
             const result = await ymaps3.search({ text: inputAddress.value, limit: 1 });
             const coordinates = result[0]?.geometry?.coordinates;
+            console.log(coordinates);
             map.update({ location: { center: coordinates, zoom: 15, duration: 400 }});
-
-            const el = document.createElement('img');
-            el.className = 'request-marker';
-            el.src = '/public/help.svg';
-            console.log(el)
-            map.addChild(new ymaps3.YMapMarker({ coordinates, draggable: true }), el);
+            mainPlaceMark.update({ coordinates });
         }
     });
+
+    const setButton = document.getElementById('setButton');
+    setButton.onclick = () => {
+        fetch('/request', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json;charset=utf-8'
+            },
+            body: JSON.stringify({
+                request_type: document.getElementById('type-select').value,
+                coordinates: mainPlaceMark.coordinates,
+                description: document.getElementById('description').value,
+            })
+        }).then(async res => {
+            let data = await res.json();
+            if (res.ok) {
+                console.log(res);
+            } else {
+                console.log('err');
+            }
+        });
+    }
 </script>
 <style>
     #app {

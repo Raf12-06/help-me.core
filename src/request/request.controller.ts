@@ -1,20 +1,20 @@
-import { Controller, Get } from '@nestjs/common';
+import { Body, Controller, Post } from '@nestjs/common';
 import { RequestService } from './request.service';
-import { RequestTypeE } from './model/request.model';
+import { CreateRequestDto } from './dto/createRequest.dto';
 
 @Controller('request')
 export class RequestController {
   constructor(private requestService: RequestService) {}
 
-  @Get()
-  public async create() {
+  @Post()
+  public async create(@Body() data: CreateRequestDto) {
     return await this.requestService.insert({
       point: {
         type: 'Point',
-        coordinates: [54.753311, 55.990001],
+        coordinates: data.coordinates,
       },
-      request_type: RequestTypeE.deliver,
-      description: 'asssss',
+      request_type: data.request_type,
+      description: data.description,
     });
   }
 }
