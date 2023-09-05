@@ -55,7 +55,7 @@
 
         const el = document.createElement('img');
         el.className = 'request-marker';
-        el.src = `/public/help.svg`;
+        el.src = `/public/select.svg`;
         mainPlaceMark = new ymaps3.YMapMarker({ coordinates: mainCoordinates }, el);
         map.addChild(mainPlaceMark);
 
@@ -89,6 +89,7 @@
 
     const setButton = document.getElementById('setButton');
     setButton.onclick = () => {
+        const [lon, lat] = mainPlaceMark.coordinates?.length ? mainPlaceMark.coordinates : mainPlaceMark.coordinates.center;
         fetch('/request', {
             method: 'POST',
             headers: {
@@ -96,13 +97,12 @@
             },
             body: JSON.stringify({
                 request_type: document.getElementById('type-select').value,
-                coordinates: mainPlaceMark.coordinates?.length ? mainPlaceMark.coordinates : mainPlaceMark.coordinates.center,
+                coordinates: [lon, lat],
                 description: document.getElementById('description').value,
             })
         }).then(async res => {
-            let data = await res.json();
             if (res.ok) {
-                console.log(res);
+                window.location.replace(`/?lon=${lon}&lat=${lat}`);
             } else {
                 console.log('err');
             }

@@ -8,7 +8,7 @@ export class RequestController {
 
   @Post()
   public async create(@Body() data: CreateRequestDto) {
-    return await this.requestService.insert({
+    return this.requestService.insert({
       point: {
         type: 'Point',
         coordinates: data.coordinates,
