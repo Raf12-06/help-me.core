@@ -9,7 +9,7 @@ import { readdirSync } from 'fs';
 import * as Handlebars from 'handlebars';
 
 async function bootstrap() {
-  const PORT = process.env.PORT;
+  const PORT = process.env.PORT ?? 8001;
 
   const fastifyAdapter = new FastifyAdapter();
   const app = await NestFactory.create<NestFastifyApplication>(
@@ -41,7 +41,7 @@ async function bootstrap() {
     return JSON.stringify(content);
   });
 
-  await app.listen(PORT, () => {
+  await app.listen(PORT, '0.0.0.0', () => {
     console.log(`Start on ${PORT}...`);
   });
 }

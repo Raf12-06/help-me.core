@@ -46,7 +46,7 @@
 
         const mapCentre = lon && lat ? [lon, lat] : [53.694955, 54.600708];
         map = new YMap(document.getElementById('app'), {
-            location: {center: mapCentre, zoom: 15}
+            location: { center: mapCentre, zoom: 15 }, restrictMapArea: [[53.54040696041918, 54.516004779749835], [53.92550926118534, 54.678869995182595]], zoomRange: { min: 12, max: 20 }
         });
 
         map.addChild(new YMapDefaultSchemeLayer());
@@ -60,9 +60,8 @@
             el.src = `/public/${request.request_type}.svg`;
             el.onclick = () => {
                 document.getElementById('req_desc').innerText = request.description;
-                const [lon, lat] = request.point.coordinates;
                 setTimeout(() => document.getElementById('req_popup').classList.add('open'), 300);
-                map.update({location: {center: [lon, lat - 0.0017], zoom: 18, duration: 400}});
+                map.update({location: {center: request.point.coordinates, zoom: 18, duration: 400}});
             }
             map.addChild(new YMapMarker({coordinates: request.point.coordinates}, el));
         }

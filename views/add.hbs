@@ -47,7 +47,7 @@
         const { YMap, YMapDefaultSchemeLayer, YMapDefaultFeaturesLayer, YMapListener } = ymaps3;
 
         map = new YMap(document.getElementById('app'), {
-            location: { center: mainCoordinates, zoom: 15.05 },
+            location: { center: mainCoordinates, zoom: 15.05 }, restrictMapArea: [[53.54040696041918, 54.516004779749835], [53.92550926118534, 54.678869995182595]], zoomRange: { min: 12, max: 20 }
         });
 
         map.addChild(new YMapDefaultSchemeLayer());
