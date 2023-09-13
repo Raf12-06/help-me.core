@@ -1,4 +1,14 @@
-import { Column, DataType, Model, Table } from 'sequelize-typescript';
+import {
+  BelongsToMany,
+  Column,
+  DataType,
+  HasMany,
+  Model,
+  Table,
+} from 'sequelize-typescript';
+
+import { Tag } from '../../tag/model/tag.model';
+import { RequestTag } from '../../tag/model/request-tag.model';
 
 export enum RequestTypeE {
   repair = 'repair',
@@ -34,4 +44,7 @@ export class Request extends Model<Request, RequestCreateAttrs> {
 
   @Column({ type: DataType.TEXT, allowNull: false })
   description: string;
+
+  @BelongsToMany(() => Tag, () => RequestTag)
+  request_tag: Tag[];
 }

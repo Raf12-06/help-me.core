@@ -5,6 +5,9 @@ import { ConfigModule } from '@nestjs/config';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { Request } from './request/model/request.model';
 import { RequestModule } from './request/request.module';
+import { TagModule } from './tag/tag.module';
+import { Tag } from './tag/model/tag.model';
+import { RequestTag } from './tag/model/request-tag.model';
 
 @Module({
   imports: [
@@ -18,11 +21,12 @@ import { RequestModule } from './request/request.module';
       username: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME,
-      models: [Request],
+      models: [Request, Tag, RequestTag],
       synchronize: true,
       autoLoadModels: true,
     }),
     RequestModule,
+    TagModule,
   ],
   controllers: [AppController],
   providers: [AppService],
